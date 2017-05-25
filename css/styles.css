@@ -1,0 +1,26 @@
+@font-face {
+    font-family: 'Ubuntu Mono', monospace;
+    font-family: 'Ubuntu', sans-serif;
+    //font-family: 'courier_newregular';
+    src: url('../fonts/cour_0-webfont.woff2') format('woff2'),
+         url('../fonts/cour_0-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+*{
+	margin:0;
+	padding:0;
+}
+
+
+body{
+	color:#fcfcfc;
+	font-family: 'Ubuntu', sans-serif;//font-family:'courier_newregular', Arial, Helvetica, sans-serif;
+	font-size:20px;
+	background:none;
+}
+
+nav ul li a:hover{
+	text-decoration:none;
+}

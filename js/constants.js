@@ -1,0 +1,4 @@
+const KEYCODE_LEFT = 37
+const KEYCODE_UP = 38
+const KEYCODE_RIGHT = 39
+const KEYCODE_DOWN = 40
