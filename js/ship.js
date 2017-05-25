@@ -8,19 +8,21 @@ const degrees = (radians) => {
 };
 
 const OrbSpeed = 5 // degrees.
-const RotationSpeed = 1
+const RotationSpeed = 3 // degress.
+const MoveSpeed = 3
 
 function RobotoShip (opts) {
-  self = this
+  const self = this
 
   this.ctx = opts.ctx
 
-  this.keyEvents()
+  this.attachKeyEvents()
   this.position = {
     x: opts.initialPosition.x - 24,
     y: opts.initialPosition.y - 24
   }
-  this.rotation = 0
+
+  this.rotation = 0 // degrees
   this.orbVelocity = { x: 0.1, y: 0.1 }
 
   this.img = LoadImage('img/logo.png', (img) => {
@@ -29,19 +31,8 @@ function RobotoShip (opts) {
 }
 
 RobotoShip.prototype = {
-  draw : function () {
+  drawOrbs : function () {
     const ctx = this.ctx
-
-    this.move()
-
-    ctx.save()
-    ctx.translate(this.position.x, this.position.y)
-    ctx.rotate(this.rotation * Math.PI/180)
-    ctx.beginPath()
-    ctx.drawImage(this.img, 0 - 24, 0 - 24, 48, 48)
-    ctx.closePath()
-    ctx.restore()
-
     const R = 60
     const center = { x: this.position.x, y: this.position.y }
 
@@ -94,10 +85,26 @@ RobotoShip.prototype = {
     ctx.closePath()
     ctx.restore()
   },
+  draw : function () {
+    const ctx = this.ctx
 
-  move : function () {
+    this.move()
 
-    // rotate orb
+    ctx.save()
+    ctx.translate(this.position.x, this.position.y)
+    ctx.rotate(radians(this.rotation))
+    ctx.beginPath()
+    ctx.drawImage(this.img, 0 - 24, 0 - 24, 48, 48)
+    ctx.closePath()
+    ctx.restore()
+
+    this.drawOrbs()
+
+  },
+
+  move: function () {
+
+    // rotate orbs
     const vel = this.orbVelocity
     vel.x += OrbSpeed
     vel.y += OrbSpeed
@@ -105,9 +112,11 @@ RobotoShip.prototype = {
     // moving X
     if (this.rightPressed) {
       this.rotation += RotationSpeed
+      console.log('current rotation angle ', this.rotation)
     }
     else if (this.leftPressed) {
       this.rotation += -RotationSpeed
+      console.log('current rotation angle ', this.rotation)
     }
 
     // moving Y
@@ -120,16 +129,17 @@ RobotoShip.prototype = {
   },
 
   addVelocity: function() {
+    const pos = this.position
     // length of veloctity vector estimated with pythagoras
     // theorem, i.e.
     // 		a*a + b*b = c*c
-    if (this.vel.x*this.vel.x + this.vel.y*this.vel.y < 20*20) {
-      this.vel.x += 0.05*Math.cos(this.angle);
-      this.vel.y += 0.05*Math.sin(this.angle);
-    }
+    //if (vel.x * vel.x + vel.y * vel.y < 20 * 20) {
+      pos.x += MoveSpeed * Math.cos(radians(this.rotation))
+      pos.y += MoveSpeed * Math.sin(radians(this.rotation))
+    //}
   },
 
-  keyEvents: function () {
+  attachKeyEvents: function () {
     function keyDownHandler(e) {
       if (e.keyCode == KEYCODE_RIGHT) this.rightPressed = true
       else if (e.keyCode == KEYCODE_LEFT) this.leftPressed = true
