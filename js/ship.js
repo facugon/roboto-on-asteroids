@@ -7,9 +7,11 @@ const degrees = (radians) => {
   return radians * 180 / Math.PI;
 };
 
-const OrbSpeed = 5 // degrees.
-const RotationSpeed = 3 // degress.
-const MoveSpeed = 3
+const ORB_SPEED = 5 // degrees.
+const ROTATION_SPEED = 3 // degress.
+const ACCELERATION = 0.02
+const BRAKE = 0.01
+const MAX_VELOCITY = 4
 
 function RobotoShip (opts) {
   const self = this
@@ -22,6 +24,7 @@ function RobotoShip (opts) {
     y: opts.initialPosition.y - 24
   }
 
+  this.velocity = 0
   this.rotation = 0 // degrees
   this.orbVelocity = { x: 0.1, y: 0.1 }
 
@@ -92,7 +95,9 @@ RobotoShip.prototype = {
 
     ctx.save()
     ctx.translate(this.position.x, this.position.y)
+
     ctx.rotate(radians(this.rotation))
+    ctx.rotate(radians(90))
     ctx.beginPath()
     ctx.drawImage(this.img, 0 - 24, 0 - 24, 48, 48)
     ctx.closePath()
@@ -106,37 +111,40 @@ RobotoShip.prototype = {
 
     // rotate orbs
     const vel = this.orbVelocity
-    vel.x += OrbSpeed
-    vel.y += OrbSpeed
+    vel.x += ORB_SPEED
+    vel.y += ORB_SPEED
+
+    if (this.velocity > 0) {
+      const pos = this.position
+      pos.x += this.velocity * Math.cos(radians(this.rotation))
+      pos.y += this.velocity * Math.sin(radians(this.rotation))
+    }
 
     // moving X
     if (this.rightPressed) {
-      this.rotation += RotationSpeed
-      console.log('current rotation angle ', this.rotation)
+      this.rotation += ROTATION_SPEED
     }
     else if (this.leftPressed) {
-      this.rotation += -RotationSpeed
-      console.log('current rotation angle ', this.rotation)
+      this.rotation += -ROTATION_SPEED
     }
 
-    // moving Y
-    //if (this.downPressed && pos.y < game.canvas.height) {
-    //  pos.y += this.velocity
-    //}
     if (this.upPressed) {
-      this.addVelocity()
+      this.incrementVelocity()
+    } else if (this.downPressed) {
+      this.reduceVelocity()
     }
   },
 
-  addVelocity: function() {
-    const pos = this.position
-    // length of veloctity vector estimated with pythagoras
-    // theorem, i.e.
-    // 		a*a + b*b = c*c
-    //if (vel.x * vel.x + vel.y * vel.y < 20 * 20) {
-      pos.x += MoveSpeed * Math.cos(radians(this.rotation))
-      pos.y += MoveSpeed * Math.sin(radians(this.rotation))
-    //}
+  incrementVelocity: function() {
+    if (this.velocity < MAX_VELOCITY) {
+      this.velocity += ACCELERATION
+    }
+  },
+
+  reduceVelocity: function() {
+    if (this.velocity > 0) {
+      this.velocity -= ACCELERATION
+    }
   },
 
   attachKeyEvents: function () {
